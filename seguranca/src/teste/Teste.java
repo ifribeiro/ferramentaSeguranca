@@ -40,79 +40,70 @@ public class Teste {
         Teste t = new Teste();
         String jdbcUrl = "jdbc:mysql://localhost/programas?user=root";
         Connection con = DriverManager.getConnection(jdbcUrl);
-        Statement stmt = con.createStatement();
-        Scanner sc = new Scanner(System.in);
-        System.out.print("Seu email ");
-        String email = sc.next();
-        System.out.print("Sua senha ");
-        String senha = sc.next();
-        //String SQL = "INSERT INTO `jma`(`email`,`senha`,`situacao`) VALUES ('"+email+"','"+senha+"',1"+")";
-        //stmt.execute(SQL);
-        if(!t.isRegistrado(stmt)){
-            //exibir janela indicando que o computador nao esta registrado
+        Statement stmt = con.createStatement();        
+        if (!t.isRegistrado(stmt)) {
+            //exibir janela pra registrar o computador nao esta registrado
             //sair do jogo
+            Scanner sc = new Scanner(System.in);
+            System.out.print("Seu email ");
+            String email = sc.next();            
+            String senha = t.numeroRegistro();
+            String SQL = "INSERT INTO `jma`(`email`,`senha`,`situacao`) VALUES ('"+email+"','"+senha+"',1"+")";
+            stmt.execute(SQL);
         }
-        
-
-        /*
-        rs.next();
-        while(!rs.isLast()){
-            rs.next();
-            int id_coluna = rs.getInt("id");
-            String nome = rs.getString("nome");
-            System.out.println(id_coluna+" "+nome+" ");
-        }*/
         con.close();
     }
-    
-    public boolean isRegistrado(Statement stmt) throws SQLException{
+
+    public boolean isRegistrado(Statement stmt) throws SQLException {
         String serialNumber = numeroRegistro();
+        String numRegistro = "";
         boolean registrado = false;
-        if(serialNumber.isEmpty()){
-            registrado = false;
-        }else{
-            
-            registrado = true;
+        String SQL = "SELECT * FROM `jma` WHERE senha='" + serialNumber + "'";
+        ResultSet resultado = stmt.executeQuery(SQL);
+        while (resultado.next()) {
+            numRegistro = resultado.getString("senha");
         }
-        /**
-        String SQL = "SELECT `situacao` FROM `jma` WHERE senha='"+serialNumber+"'";
-        stmt.execute(SQL);
-        stmt.getResultSet();*/      
-               
+        
+        if (numRegistro.isEmpty()) {
+            registrado = false;
+        } else {
+            if(serialNumber.equals(numRegistro)){
+                registrado = true;
+            }
+            
+        }
         return registrado;
     }
 
     private String numeroRegistro() {
         String SO = getSO();//versao do SO
         String numeroRegistro = "";
-        switch(SO){
+        switch (SO) {
             case "WINDOWS":
                 numeroRegistro = getNumeroRegistroWindows();
                 break;
             case "linux":
                 numeroRegistro = getNumeroRegistroLinux();
-                break;   
-        }        
-        return numeroRegistro;       
+                break;
+        }
+        return numeroRegistro;
     }
 
     private String getSO() {
-        //fazer funçao que retorna o SO
         String SO = "";
         String nome = System.getProperty("os.name");
         nome = nome.toUpperCase();
-        if(nome.contains("WINDOWS")){
+        if (nome.contains("WINDOWS")) {
             SO = "WINDOWS";
-        }else{
+        } else {
             SO = "LINUX";
         }
-        System.out.println("SO "+SO);
         return SO;
     }
 
     private String getNumeroRegistroWindows() {
         String result = "";
-        try {            
+        try {
             Process p = Runtime.getRuntime().exec("wmic baseboard get serialnumber");
             BufferedReader input
                     = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -122,9 +113,9 @@ public class Teste {
             }
             input.close();
         } catch (IOException ex) {
-           
+
         }
-        String[] numero = result.split( " " );        
+        String[] numero = result.split(" ");
         return numero[2];
     }
 
