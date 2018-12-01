@@ -36,9 +36,9 @@ public class Teste {
      * @param args the command line argifrasuments
      */
     public static void main(String[] args) throws SQLException, IOException {
-        //String jdbcUrl = "jdbc:mysql://localhost/programas?user=root&password=anabolero";
+        String jdbcUrl = "jdbc:mysql://localhost/programas?user=root&password=anabolero";
         Teste t = new Teste();
-        String jdbcUrl = "jdbc:mysql://localhost/programas?user=root";
+        //String jdbcUrl = "jdbc:mysql://localhost/programas?user=root";
         Connection con = DriverManager.getConnection(jdbcUrl);
         Statement stmt = con.createStatement();        
         if (!t.isRegistrado(stmt)) {
